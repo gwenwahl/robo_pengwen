@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 import discord
 import asyncio
 import sqlite3
+import os
 from datetime import datetime, timedelta
 
 client = discord.Client()
@@ -25,7 +27,10 @@ async def on_message(message):
             c.execute("INSERT INTO jar_reports ('author_id', 'report_id', 'reported_at') VALUES (?,?,?)", report)
             conn.commit()
             conn.close()
-            await client.send_message(message.channel, "You've been naughty {}!".format(message.mentions[0].nick))
+            name = message.mentions[0].nick
+            if name is None:
+                name = message.mentions[0].name
+            await client.send_message(message.channel, "You've been naughty {}!".format(name))
             await asyncio.sleep(2)
             await client.delete_message(message)
         else:
@@ -34,4 +39,4 @@ async def on_message(message):
             await asyncio.sleep(11)
             await client.delete_message(err)    
 
-client.run('im secret ;)')
+client.run(os.environ['DISCORD_KEY'])
